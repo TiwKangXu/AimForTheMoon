@@ -3,8 +3,8 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from tinydb import TinyDB, Query
 import datetime
 from keep_alive import keep_alive
-
-BOT_TOKEN = "8370878988:AAEP3NBy0xmybroPm9Fy63q9OShRLNMDtPY"
+import os
+BOT_TOKEN = os.environ["BOT_TOKEN"]
 
 db = TinyDB("tasks.json")
 Task = Query()
