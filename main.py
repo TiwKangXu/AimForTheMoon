@@ -6,7 +6,7 @@ from keep_alive import keep_alive
 import os
 from dotenv import load_dotenv
 
-load_dotenv() 
+load_dotenv()
 BOT_TOKEN = os.environ["BOT_TOKEN"]
 
 db = TinyDB("tasks.json")
