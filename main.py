@@ -12,10 +12,11 @@ from dotenv import load_dotenv
 load_dotenv()
 BOT_TOKEN = os.environ["BOT_TOKEN"]
 
-firebase_key_path = os.environ.get("FIREBASE_CRED")
-cred = credentials.Certificate(firebase_key_path)
+firebase_cred_json = os.getenv("FIREBASE_CRED")
+cred_dict = json.loads(firebase_cred_json)
+cred = credentials.Certificate(cred_dict)
 firebase_admin.initialize_app(cred, {
-    'databaseURL': 'https://aimforthemoon-753bc-default-rtdb.asia-southeast1.firebasedatabase.app/'
+    'databaseURL': 'https://aimforthemoon-753bc-default-rtdb.asia-southeast1.firebasedatabase.app'
 })
 
 # Helper function to get user's task path
