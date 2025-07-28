@@ -1,16 +1,26 @@
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from tinydb import TinyDB, Query
+import firebase_admin
+from firebase_admin import credentials, db as fb_db
 import datetime
 from keep_alive import keep_alive
 import os
+import json
 from dotenv import load_dotenv
 
 load_dotenv()
 BOT_TOKEN = os.environ["BOT_TOKEN"]
 
-db = TinyDB("tasks.json")
-Task = Query()
+firebase_key_path = os.environ.get("FIREBASE_KEY_PATH")
+cred = credentials.Certificate(firebase_key_path)
+firebase_admin.initialize_app(cred, {
+    'databaseURL': 'https://aimforthemoon-753bc-default-rtdb.asia-southeast1.firebasedatabase.app/'
+})
+
+# Helper function to get user's task path
+def task_ref(user_id, date):
+    return fb_db.reference(f"tasks/{user_id}/{date}")
 
 
 # /start command
@@ -53,14 +63,11 @@ async def setgoals(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "❗ Please enter exactly 3 tasks, separated by commas.")
         return
 
-    db.upsert(
-        {
-            "user_id": user_id,
-            "username": name,
-            "date": today,
-            "tasks": tasks,
-            "done": []
-        }, (Task.user_id == user_id) & (Task.date == today))
+    task_ref(user_id, today).set({
+        "username": name,
+        "tasks": tasks,
+        "done": []
+    })
 
     await update.message.reply_text(
         f"✅ Got it, {name}! Your tasks for today are:\n"
@@ -71,7 +78,8 @@ async def setgoals(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def done(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = str(update.effective_user.id)
     today = str(datetime.date.today())
-    entry = db.get((Task.user_id == user_id) & (Task.date == today))
+    ref = task_ref(user_id, today)
+    entry = ref.get()
 
     if not entry:
         await update.message.reply_text(
@@ -83,8 +91,12 @@ async def done(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if 0 <= i < 3 and i not in entry["done"]:
             entry["done"].append(i)
 
-    db.update({"done": entry["done"]},
-              (Task.user_id == user_id) & (Task.date == today))
+    indexes = [int(i) - 1 for i in context.args if i.isdigit()]
+    for i in indexes:
+        if 0 <= i < 3 and i not in entry.get("done", []):
+            entry["done"].append(i)
+
+    ref.update({"done": entry["done"]})
 
     done_items = [f"✔️ {entry['tasks'][i]}" for i in entry["done"]]
     await update.message.reply_text("📌 Tasks marked done:\n" +
@@ -95,7 +107,11 @@ async def done(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def tasks(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = str(update.effective_user.id)
     today = str(datetime.date.today())
-    entry = db.get((Task.user_id == user_id) & (Task.date == today))
+    entry = task_ref(user_id, today).get()
+    if not entry:
+        await update.message.reply_text(
+            "⚠️ You haven't set your tasks yet. Use /setgoals.")
+        return
 
     if not entry:
         await update.message.reply_text(
@@ -113,10 +129,10 @@ async def tasks(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # /stats command
 async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = str(update.effective_user.id)
-    records = db.search(Task.user_id == user_id)
+    user_tasks = fb_db.reference(f"tasks/{user_id}").get() or {}
 
-    total_days = len(set([r["date"] for r in records]))
-    full_days = sum(1 for r in records if len(r.get("done", [])) == 3)
+    total_days = len(user_tasks)
+    full_days = sum(1 for r in user_tasks.values() if len(r.get("done", [])) == 3)
 
     await update.message.reply_text(f"📈 Your Productivity Stats:\n"
                                     f"Total days tracked: {total_days}\n"
