@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 load_dotenv()
 BOT_TOKEN = os.environ["BOT_TOKEN"]
 
-firebase_key_path = os.environ.get("FIREBASE_KEY_PATH")
+firebase_key_path = os.environ.get("FIREBASE_CRED")
 cred = credentials.Certificate(firebase_key_path)
 firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://aimforthemoon-753bc-default-rtdb.asia-southeast1.firebasedatabase.app/'
