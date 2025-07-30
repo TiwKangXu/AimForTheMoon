@@ -3,10 +3,8 @@ from threading import Thread
 
 app = Flask(__name__)
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/", methods=["GET"])
 def home():
-    if request.method == "POST":
-        return "OK", 200
     return "Bot is running!", 200
 
 def run():
