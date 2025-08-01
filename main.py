@@ -1,5 +1,6 @@
+from warnings import filters
 from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler
 import firebase_admin
 from firebase_admin import credentials, db as fb_db
 import datetime
@@ -13,10 +14,8 @@ logging.basicConfig(level=logging.INFO)
 # Load environment variables
 load_dotenv()
 BOT_TOKEN = os.environ["BOT_TOKEN"]
-WEBHOOK_HOST = os.environ["WEBHOOK_URL"]
-WEBHOOK_PATH = "/webhook"
-WEBHOOK_URL = WEBHOOK_HOST + WEBHOOK_PATH
-PORT = int(os.environ.get("PORT", 8443))
+PORT = int(os.environ.get("PORT", 8080))  # Render expects this port
+WEBHOOK_URL = os.environ["WEBHOOK_URL"]
 
 # Firebase setup
 firebase_cred_json = os.getenv("FIREBASE_CRED")
@@ -102,7 +101,7 @@ async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(f"📈 Your Productivity Stats:\nTotal days tracked: {total_days}\nDays all tasks completed: {full_days}")
 
 def main():
-    keep_alive()
+    # keep_alive()
 
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
@@ -113,7 +112,13 @@ def main():
     app.add_handler(CommandHandler("tasks", tasks))
     app.add_handler(CommandHandler("stats", stats))
 
-    app.run_polling()
+    app.run_webhook(
+        listen="0.0.0.0",
+        port=PORT,
+        webhook_url=WEBHOOK_URL,
+        allowed_updates=Update.ALL_TYPES,
+    )
+    # app.run_polling()
 
 if __name__ == "__main__":
     main()
