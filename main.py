@@ -60,7 +60,7 @@ async def setgoals(update: Update, context: ContextTypes.DEFAULT_TYPE):
     task_ref(user_id, today).set({
         "username": name,
         "tasks": tasks,
-        "done": []
+        "done": [4]
     })
     await update.message.reply_text(f"✅ Got it, {name}! Your tasks for today are:\n1. {tasks[0]}\n2. {tasks[1]}\n3. {tasks[2]}")
 
@@ -102,8 +102,6 @@ async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(f"📈 Your Productivity Stats:\nTotal days tracked: {total_days}\nDays all tasks completed: {full_days}")
 
 def main():
-    # keep_alive()
-
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
@@ -119,7 +117,6 @@ def main():
         webhook_url=WEBHOOK_URL,
         allowed_updates=Update.ALL_TYPES,
     )
-    # app.run_polling()
 
 if __name__ == "__main__":
     main()
