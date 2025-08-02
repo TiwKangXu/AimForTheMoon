@@ -4,7 +4,6 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, Messa
 import firebase_admin
 from firebase_admin import credentials, db as fb_db
 import datetime
-from keep_alive import keep_alive
 import os
 import json
 from dotenv import load_dotenv
