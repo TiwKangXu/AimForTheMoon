@@ -76,7 +76,7 @@ async def done(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if 0 <= i < 3 and i not in entry.get("done", []):
             entry["done"].append(i)
     ref.update({"done": entry["done"]})
-    done_items = [f"✔️ {entry['tasks'][i]}" for i in entry["done"]]
+    done_items = [f"✔️ {entry['tasks'][i]}" for i in entry["done"] if i != 999]
     await update.message.reply_text("📌 Tasks marked done:\n" + "\n".join(done_items))
 
 async def tasks(update: Update, context: ContextTypes.DEFAULT_TYPE):
