@@ -60,7 +60,7 @@ async def setgoals(update: Update, context: ContextTypes.DEFAULT_TYPE):
     task_ref(user_id, today).set({
         "username": name,
         "tasks": tasks,
-        "done": [4]
+        "done": [999]
     })
     await update.message.reply_text(f"✅ Got it, {name}! Your tasks for today are:\n1. {tasks[0]}\n2. {tasks[1]}\n3. {tasks[2]}")
 
