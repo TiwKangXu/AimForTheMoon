@@ -8,7 +8,7 @@ import os
 import json
 from dotenv import load_dotenv
 import logging
-from bot.handlers import start, help_command, stats, setgoals, done, tasks
+from bot import start, help_command, stats, setgoals, done, tasks
 
 
 logging.basicConfig(level=logging.INFO)
