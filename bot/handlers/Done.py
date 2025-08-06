@@ -18,5 +18,5 @@ async def done(update: Update, context: ContextTypes.DEFAULT_TYPE):
             entry["done"].append(i)
     ref.update({"done": entry["done"]})
     done_items = [f"✔️ {entry['tasks'][i]}" for i in entry["done"] if i != 999]
-    logging.info(f"/setgoals, tasks: {task_ref(user_id, today)["tasks"]}; done: {task_ref(user_id, today)["done"]}")
+    logging.info(f"/tasks, tasks: {entry["tasks"]}; done: {entry["done"]}")
     await update.message.reply_text("📌 Tasks marked done:\n" + "\n".join(done_items))

@@ -18,5 +18,6 @@ async def setgoals(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "tasks": tasks,
         "done": [999]
     })
-    logging.info(f"/setgoals, tasks: {task_ref(user_id, today)["tasks"]}; done: {task_ref(user_id, today)["done"]}")
+    entry = task_ref(user_id, today).get()
+    logging.info(f"/tasks, tasks: {entry["tasks"]}; done: {entry["done"]}")
     await update.message.reply_text(f"✅ Got it, {name}! Your tasks for today are:\n1. {tasks[0]}\n2. {tasks[1]}\n3. {tasks[2]}")

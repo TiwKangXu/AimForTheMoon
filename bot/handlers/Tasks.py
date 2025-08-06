@@ -17,5 +17,5 @@ async def tasks(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for i, task in enumerate(entry["tasks"]):
         prefix = "✔️" if i in done_list else "❌"
         tasks_text += f"{prefix} {i+1}. {task}\n"
-    logging.info(f"/tasks, tasks: {task_ref(user_id, today)["tasks"]}; done: {task_ref(user_id, today)["done"]}")
+    logging.info(f"/tasks, tasks: {entry["tasks"]}; done: {entry["done"]}")
     await update.message.reply_text(f"📋 Your tasks today:\n{tasks_text}")
