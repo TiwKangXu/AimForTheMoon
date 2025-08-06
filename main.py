@@ -98,7 +98,7 @@ async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = str(update.effective_user.id)
     user_tasks = fb_db.reference(f"tasks/{user_id}").get() or {}
     total_days = len(user_tasks)
-    full_days = sum(1 for r in user_tasks.values() if len(r.get("done", [])) == 3)
+    full_days = sum(1 for r in user_tasks.values() if len(r.get("done", [])) >= 3)
     await update.message.reply_text(f"📈 Your Productivity Stats:\nTotal days tracked: {total_days}\nDays all tasks completed: {full_days}")
 
 def main():
